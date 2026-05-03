@@ -108,7 +108,7 @@ try:
 
     MODEL_PATH = 'static/model/model.h5'
     if os.path.exists(MODEL_PATH):
-        model = keras.models.load_model(MODEL_PATH)
+        model = keras.models.load_model(MODEL_PATH, compile=False)
     else:
         model = Sequential()
         model.add(Input(shape=(X.shape[1])))
