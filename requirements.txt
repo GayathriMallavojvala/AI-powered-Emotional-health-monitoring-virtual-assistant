@@ -6,4 +6,3 @@ django
 gunicorn
 whitenoise
 dj-database-url
-python-dotenv
