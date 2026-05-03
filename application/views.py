@@ -108,7 +108,8 @@ try:
 
     MODEL_PATH = 'static/model/model.h5'
     if os.path.exists(MODEL_PATH):
-        model = keras.models.load_model(MODEL_PATH, compile=False)
+        import tensorflow as tf
+        model = tf.keras.models.load_model(MODEL_PATH, compile=False, safe_mode=False)
     else:
         model = Sequential()
         model.add(Input(shape=(X.shape[1])))
