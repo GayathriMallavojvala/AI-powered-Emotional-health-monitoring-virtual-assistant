@@ -4,13 +4,6 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import numpy as np
-import pandas as pd
-import warnings
-warnings.filterwarnings('ignore')
-import json
-import re
-import random
 import os
 
 def home(request):
@@ -72,86 +65,8 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
-# Load NLP model and data at startup
-try:
-    import tensorflow as tf
-    from tensorflow import keras
-    from tensorflow.keras.preprocessing.text import Tokenizer
-    from tensorflow.keras.preprocessing.sequence import pad_sequences
-    from tensorflow.keras.models import Sequential, load_model
-    from tensorflow.keras.layers import Input, Embedding, LSTM, LayerNormalization, Dense, Dropout
-    from sklearn.preprocessing import LabelEncoder
-
-    with open('static/Dataset/intents.json', 'r') as f:
-        data = json.load(f)
-    df_intents = pd.DataFrame(data['intents'])
-    dic = {"tag": [], "patterns": [], "responses": []}
-    for i in range(len(df_intents)):
-        ptrns = df_intents[df_intents.index == i]['patterns'].values[0]
-        rspns = df_intents[df_intents.index == i]['responses'].values[0]
-        tag = df_intents[df_intents.index == i]['tag'].values[0]
-        for j in range(len(ptrns)):
-            dic['tag'].append(tag)
-            dic['patterns'].append(ptrns[j])
-            dic['responses'].append(rspns)
-    df = pd.DataFrame.from_dict(dic)
-
-    tokenizer = Tokenizer(lower=True, split=' ')
-    tokenizer.fit_on_texts(df['patterns'])
-    vacab_size = len(tokenizer.word_index)
-
-    ptrn2seq = tokenizer.texts_to_sequences(df['patterns'])
-    X = pad_sequences(ptrn2seq, padding='post')
-
-    lbl_enc = LabelEncoder()
-    y = lbl_enc.fit_transform(df['tag'])
-
-    MODEL_PATH = 'static/model/model.h5'
-    if os.path.exists(MODEL_PATH):
-        model = keras.models.load_model(MODEL_PATH)
-    else:
-        model = Sequential()
-        model.add(Input(shape=(X.shape[1])))
-        model.add(Embedding(input_dim=vacab_size+1, output_dim=100, mask_zero=True))
-        model.add(LSTM(32, return_sequences=True))
-        model.add(LayerNormalization())
-        model.add(LSTM(32, return_sequences=True))
-        model.add(LayerNormalization())
-        model.add(LSTM(32))
-        model.add(LayerNormalization())
-        model.add(Dense(128, activation="relu"))
-        model.add(LayerNormalization())
-        model.add(Dropout(0.2))
-        model.add(Dense(128, activation="relu"))
-        model.add(LayerNormalization())
-        model.add(Dropout(0.2))
-        model.add(Dense(len(np.unique(y)), activation="softmax"))
-        model.compile(optimizer='adam', loss="sparse_categorical_crossentropy", metrics=['accuracy'])
-        model.fit(x=X, y=y, batch_size=10, epochs=50,
-                  callbacks=[tf.keras.callbacks.EarlyStopping(monitor='accuracy', patience=3)])
-        model.save(MODEL_PATH)
-
-    NLP_READY = True
-except Exception as e:
-    NLP_READY = False
-    print(f"NLP model not loaded: {e}")
-
 def generate_answer(pattern):
-    if not NLP_READY:
-        return "Sorry, the AI model is not available right now."
-    text = []
-    txt = re.sub('[^a-zA-Z\']', ' ', pattern)
-    txt = txt.lower().split()
-    txt = " ".join(txt)
-    text.append(txt)
-    x_test = tokenizer.texts_to_sequences(text)
-    x_test = np.array(x_test).squeeze()
-    x_test = pad_sequences([x_test], padding='post', maxlen=X.shape[1])
-    y_pred = model.predict(x_test)
-    y_pred = y_pred.argmax()
-    tag = lbl_enc.inverse_transform([y_pred])[0]
-    responses = df[df['tag'] == tag]['responses'].values[0]
-    return random.choice(responses)
+    return "I'm here to help with your mental health questions. Please consult a professional for medical advice."
 
 @csrf_exempt
 def chatbot_view(request):
