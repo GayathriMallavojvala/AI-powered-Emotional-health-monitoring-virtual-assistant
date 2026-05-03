@@ -16,6 +16,7 @@ SECRET_KEY = 'django-insecure-u(q$g8sz^32vba1dx39*$5+-xjv=60d6)6v-q6i$!2lzf3$6ne
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://illustrious-growth-production-4ccc.up.railway.app']
 
 # Application definition
 INSTALLED_APPS = [
