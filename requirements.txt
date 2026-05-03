@@ -1,7 +1,7 @@
-numpy
+numpy==1.24.3
 pandas
 scikit-learn
-tensorflow-cpu==2.17.0
+tensorflow-cpu==2.16.2
 django
 gunicorn
 whitenoise
