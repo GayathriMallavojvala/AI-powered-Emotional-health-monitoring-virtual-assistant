@@ -1,0 +1,12 @@
+<<<<<<< HEAD
+numpy==1.19.2
+pandas==1.3.5
+tensorflow==1.14.0
+scikit-learn==0.22.2post1
+=======
+numpy==1.19.2
+pandas==1.3.5
+tensorflow==1.14.0
+scikit-learn==0.22.2post1
+>>>>>>> ec801586909e6a3a96228ccbc1e34c71002c789b
+django
